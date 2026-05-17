@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UB Anúncios — Sistema de Gestão</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap');
+:root{
+  --navy:#0D2B55;--orange:#E87722;--orange2:#FF9244;
+  --bg:#0A0F1E;--bg2:#0F1628;--card:#141E35;--card2:#1A2540;
+  --border:rgba(255,255,255,0.07);--text:#E8EDF5;--muted:#7A8BAD;
+  --green:#1DB87A;--red:#E84444;--blue:#3B82F6;--yellow:#F59E0B;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:var(--bg2);}::-webkit-scrollbar-thumb{background:var(--card2);border-radius:4px;}
+.header{background:linear-gradient(135deg,var(--navy),#0A1A35);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;}
+.logo span{color:var(--orange);}
+.date-badge{font-size:11px;color:var(--muted);background:var(--card);padding:5px 12px;border-radius:20px;border:1px solid var(--border);}
+.tabs{display:flex;gap:2px;padding:12px 20px 0;border-bottom:1px solid var(--border);background:var(--bg2);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:9px 16px;border-radius:8px 8px 0 0;cursor:pointer;color:var(--muted);transition:all .2s;white-space:nowrap;border:none;background:transparent;}
+.tab:hover{color:var(--text);background:var(--card);}
+.tab.on{color:var(--orange);background:var(--card);border-bottom:2px solid var(--orange);}
+.main{padding:20px;max-width:1400px;margin:0 auto;}
+.page{display:none;}.page.on{display:block;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.c-lbl{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.c-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;}
+.c-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+.sec{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.tw{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px;}
+.th{background:var(--card2);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.th-t{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
+table{width:100%;border-collapse:collapse;}
+th{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:9px 16px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;font-family:'Syne',sans-serif;}
+.bg{background:rgba(29,184,122,.15);color:var(--green);}
+.bo{background:rgba(232,119,34,.15);color:var(--orange);}
+.br{background:rgba(232,68,68,.15);color:var(--red);}
+.bb{background:rgba(59,130,246,.15);color:var(--blue);}
+.bm{background:rgba(122,139,173,.15);color:var(--muted);}
+input,select,textarea{background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color .2s;}
+input:focus,select:focus{border-color:var(--orange);}
+input::placeholder{color:var(--muted);}
+select option{background:var(--card2);}
+.btn{background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:background .2s;white-space:nowrap;}
+.btn:hover{background:var(--orange2);}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Syne',sans-serif;font-weight:600;font-size:12px;cursor:pointer;transition:all .2s;}
+.btn-g:hover{border-color:var(--orange);color:var(--orange);}
+.btn-r{background:rgba(232,68,68,.15);color:var(--red);border:none;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;}
+.btn-e{background:rgba(59,130,246,.15);color:var(--blue);border:none;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;}
+.fg{margin-bottom:12px;}
+.fl{font-size:10px;color:var(--muted);margin-bottom:5px;display:block;font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.fg input,.fg select,.fg textarea{width:100%;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;}
+.mo.open{display:flex;}
+.modal{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:22px;width:92%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal-t{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;color:var(--orange);}
+.modal-f{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
+.gc{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.gc-head{background:var(--card2);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.gc-av{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.av-ua{background:linear-gradient(135deg,var(--orange),var(--orange2));}
+.av-jp{background:linear-gradient(135deg,#1D4ED8,var(--blue));}
+.av-ac{background:linear-gradient(135deg,#059669,var(--green));}
+.gc-stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);}
+.gc-stat{padding:13px 16px;text-align:center;border-right:1px solid var(--border);}
+.gc-stat:last-child{border-right:none;}
+.gc-sv{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;}
+.gc-sl{font-size:10px;color:var(--muted);margin-top:2px;}
+.cl-box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.cl-head{background:var(--card2);padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.cl-bar{height:3px;background:var(--bg);}
+.cl-fill{height:100%;transition:width .4s;}
+.ck{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.04);}
+.ck:last-child{border-bottom:none;}
+.ck:active{background:rgba(255,255,255,.03);}
+.ck-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.ck-box.done{background:var(--green);border-color:var(--green);}
+.ck-box.done::after{content:'✓';color:white;font-size:12px;font-weight:800;}
+.ck-txt{flex:1;}
+.ck-lbl{font-size:13px;}
+.ck-lbl.done{text-decoration:line-through;color:var(--muted);}
+.ck-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.pw{background:var(--bg);border-radius:4px;height:4px;overflow:hidden;margin-top:5px;}
+.pb{height:100%;border-radius:4px;transition:width .5s;}
+.alerta{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;margin-bottom:8px;font-size:13px;}
+.al-b{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#93C5FD;}
+.al-y{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#FDE68A;}
+@media(max-width:600px){
+  .g3,.g4{grid-template-columns:1fr 1fr;}
+  .g2{grid-template-columns:1fr;}
+  .fr{grid-template-columns:1fr;}
+  .main{padding:14px;}
+  .gc-stats{grid-template-columns:1fr 1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">UB <span>Anúncios</span></div>
+  <div class="date-badge" id="hdrDate"></div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="goTab('dash',this)">📊 Dashboard</button>
+  <button class="tab" onclick="goTab('gestores',this)">👥 Gestores</button>
+  <button class="tab" onclick="goTab('clientes',this)">🏪 Clientes</button>
+  <button class="tab" onclick="goTab('vendas',this)">🚗 Vendas</button>
+  <button class="tab" onclick="goTab('checklist',this)">✅ Checklist</button>
+  <button class="tab" onclick="goTab('relatorio',this)">📈 Relatório</button>
+</div>
+
+<div class="main">
+
+  <div class="page on" id="p-dash">
+    <div class="sec">Visão Geral</div>
+    <div class="g4">
+      <div class="card"><div class="c-lbl">🏪 Clientes</div><div class="c-val" style="color:var(--orange)" id="d-cl">0</div><div class="c-sub">lojas ativas</div></div>
+      <div class="card"><div class="c-lbl">🚗 Total Vendido</div><div class="c-val" style="color:var(--green)" id="d-ca">0</div><div class="c-sub">carros registrados</div></div>
+      <div class="card"><div class="c-lbl">💰 Gasto Total</div><div class="c-val" style="font-size:20px" id="d-gt">R$0</div><div class="c-sub">em anúncios</div></div>
+      <div class="card"><div class="c-lbl">📅 Mês Atual</div><div class="c-val" style="color:var(--blue)" id="d-cm">0</div><div class="c-sub">carros este mês</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="c-lbl">👥 Por Gestor</div>
+        <div style="margin-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>🔵 João Paulo</span><span style="color:var(--blue)" id="d-jp">0</span></div>
+          <div class="pw"><div class="pb" id="d-jp-b" style="background:var(--blue);width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;margin-top:12px"><span>🟢 Ana Clara</span><span style="color:var(--green)" id="d-ac">0</span></div>
+          <div class="pw"><div class="pb" id="d-ac-b" style="background:var(--green);width:0%"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="c-lbl">🚗 Carros por Cliente</div>
+        <div id="d-vcl" style="margin-top:10px;font-size:13px;color:var(--muted)">Nenhuma venda.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="p-gestores">
+    <div class="sec">Gestores</div>
+    <div class="g3" id="gc-wrap"></div>
+  </div>
+
+  <div class="page" id="p-clientes">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="sec" style="margin-bottom:0;flex:1">Clientes</div>
+      <button class="btn" onclick="abrirCliente()">+ Novo Cliente</button>
+    </div>
+    <div class="tw">
+      <div class="th"><div class="th-t">Carteira de Clientes</div></div>
+      <div style="overflow-x:auto">
+      <table><thead><tr>
+        <th>Loja</th><th>Cidade</th><th>Gestor</th><th>Verba/dia</th><th>Recarga</th><th>Carros/mês</th><th>Início</th><th>Ações</th>
+      </tr></thead><tbody id="cl-tb"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="p-vendas">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="sec" style="margin-bottom:0;flex:1">Vendas</div>
+      <button class="btn" onclick="openM('m-venda')">+ Registrar Venda</button>
+    </div>
+    <div id="vd-wrap"></div>
+  </div>
+
+  <div class="page" id="p-checklist">
+    <div class="sec">Checklist Diário</div>
+    <div id="cl-alertas" style="margin-bottom:14px"></div>
+    <div class="g3" id="cl-resumo"></div>
+    <div id="cl-listas"></div>
+  </div>
+
+  <div class="page" id="p-relatorio">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="sec" style="margin-bottom:0;flex:1">Relatório de Vendas</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="rel-cliente" onchange="renderRelatorio()" style="font-size:12px;min-width:160px"><option value="">Todos os clientes</option></select>
+        <select id="rel-ano" onchange="renderRelatorio()" style="font-size:12px"></select>
+      </div>
+    </div>
+    <div id="rel-wrap"></div>
+  </div>
+
+</div>
+
+<!-- MODAIS -->
+<div class="mo" id="m-cliente">
+  <div class="modal">
+    <div class="modal-t" id="m-cl-t">➕ Novo Cliente</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nome da Loja</label><input id="c-nome" placeholder="Rodrigo Automóveis"></div>
+      <div class="fg"><label class="fl">Cidade</label><input id="c-cidade" placeholder="Araraquara - SP"></div>
+    </div>
+    <div class="fg"><label class="fl">Gestor</label>
+      <select id="c-gestor"><option value="João Paulo">João Paulo</option><option value="Ana Clara">Ana Clara</option></select>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Verba/dia (R$)</label><input type="number" id="c-verba" placeholder="40"></div>
+      <div class="fg"><label class="fl">Recarga</label>
+        <select id="c-rec"><option>Pix</option><option>Cartão de Crédito</option><option>Boleto</option></select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Data de Início</label><input type="date" id="c-inicio"></div>
+    <div class="fg"><label class="fl">Observações</label><input id="c-obs" placeholder="Observações..."></div>
+    <input type="hidden" id="c-eid">
+    <div class="modal-f">
+      <button class="btn-g" onclick="closeM('m-cliente')">Cancelar</button>
+      <button class="btn" onclick="salvarCliente()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="m-venda">
+  <div class="modal">
+    <div class="modal-t">🚗 Registrar Venda</div>
+    <div class="fg"><label class="fl">Cliente</label><select id="v-cl"></select></div>
+    <div class="fg"><label class="fl">Modelo do Carro</label><input id="v-mod" placeholder="HB20 2022 Completo"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Valor (R$)</label><input type="number" id="v-val" placeholder="64900"></div>
+      <div class="fg"><label class="fl">Gasto em Anúncio (R$)</label><input type="number" id="v-gas" placeholder="300"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Mês</label>
+        <select id="v-mes">
+          <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+          <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+          <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+          <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Ano</label><select id="v-ano"></select></div>
+    </div>
+    <div class="fg"><label class="fl">Observação</label><input id="v-obs" placeholder="Lead veio pelo Instagram"></div>
+    <div class="modal-f">
+      <button class="btn-g" onclick="closeM('m-venda')">Cancelar</button>
+      <button class="btn" onclick="addVenda()">Registrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="m-venda-edit">
+  <div class="modal">
+    <div class="modal-t">✏️ Editar Venda</div>
+    <div class="fg"><label class="fl">Modelo</label><input id="ve-mod"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Valor (R$)</label><input type="number" id="ve-val"></div>
+      <div class="fg"><label class="fl">Gasto (R$)</label><input type="number" id="ve-gas"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Mês</label>
+        <select id="ve-mes">
+          <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+          <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+          <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+          <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Ano</label><select id="ve-ano"></select></div>
+    </div>
+    <div class="fg"><label class="fl">Observação</label><input id="ve-obs"></div>
+    <input type="hidden" id="ve-id">
+    <div class="modal-f">
+      <button class="btn-g" onclick="closeM('m-venda-edit')">Cancelar</button>
+      <button class="btn" onclick="salvarVenda()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="m-tarefa">
+  <div class="modal">
+    <div class="modal-t">➕ Nova Tarefa</div>
+    <div class="fg"><label class="fl">Para quem</label>
+      <select id="t-pessoa">
+        <option value="uadson">Uadson Borges</option>
+        <option value="jp">João Paulo</option>
+        <option value="ac">Ana Clara</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Tarefa</label><input id="t-txt" placeholder="Descreva a tarefa..."></div>
+    <div class="fg"><label class="fl">Descrição (opcional)</label><input id="t-desc" placeholder="Detalhes..."></div>
+    <div class="modal-f">
+      <button class="btn-g" onclick="closeM('m-tarefa')">Cancelar</button>
+      <button class="btn" onclick="addTarefa()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var M3=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+var MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var HOJE=new Date();
+var ANO=HOJE.getFullYear(),MES=HOJE.getMonth(),DIA=HOJE.getDate(),SEM=HOJE.getDay();
+
+var CL_BASE={
+  uadson:[
+    {id:'u1',txt:'Gravar ou editar conteúdo para o Instagram da UB',sub:'Reels, carrossel ou stories com resultado de cliente'},
+    {id:'u2',txt:'Verificar performance dos anúncios da UB',sub:'CPL dos anúncios — meta abaixo de R$35'},
+    {id:'u3',txt:'Responder leads pelo WhatsApp',sub:'Nenhum lead fica sem resposta por mais de 2 horas'},
+    {id:'u4',txt:'Realizar reuniões de fechamento agendadas',sub:'Apresentar proposta e fechar contrato'},
+    {id:'u5',txt:'Revisar checklist de João Paulo e Ana Clara',sub:'Verificar se as tarefas do dia foram concluídas'}
+  ],
+  jp:[
+    {id:'jp1',txt:'Análise 1 dia — custo por conversa e msgs',sub:'Meta Ads: acima de R$5 por conversa = ajustar'},
+    {id:'jp2',txt:'Análise 3 dias — tendência de resultado',sub:'Custo subindo ou caindo? Volume estável?'},
+    {id:'jp3',txt:'Análise 7 dias — performance geral',sub:'Qual campanha está cara? Pausar ou escalar?'},
+    {id:'jp4',txt:'Ver se tem carro novo para subir',sub:'Checar com o cliente carros novos no estoque'},
+    {id:'jp5',txt:'Perguntar no grupo como estão os anúncios',sub:'"Oi [nome], como estão chegando os leads?"'},
+    {id:'jp6',txt:'Verificar saldo de todas as campanhas',sub:'Alertar o cliente 2 dias antes de zerar'},
+    {id:'jp7',txt:'Registrar carros vendidos pelos clientes',sub:'Atualizar o sistema com as vendas do dia'},
+    {id:'jp8',txt:'Enviar lista de carros ativos (toda segunda)',sub:'Lista dos carros anunciados para cada cliente'}
+  ],
+  ac:[
+    {id:'ac1',txt:'Análise 1 dia — custo por conversa e msgs',sub:'Meta Ads: acima de R$5 por conversa = ajustar'},
+    {id:'ac2',txt:'Análise 3 dias — tendência de resultado',sub:'Custo subindo ou caindo? Volume estável?'},
+    {id:'ac3',txt:'Análise 7 dias — performance geral',sub:'Qual campanha está cara? Pausar ou escalar?'},
+    {id:'ac4',txt:'Ver se tem carro novo para subir',sub:'Checar com o cliente carros novos no estoque'},
+    {id:'ac5',txt:'Perguntar no grupo como estão os anúncios',sub:'"Oi [nome], como estão chegando os leads?"'},
+    {id:'ac6',txt:'Verificar saldo de todas as campanhas',sub:'Alertar o cliente 2 dias antes de zerar'},
+    {id:'ac7',txt:'Registrar carros vendidos pelos clientes',sub:'Atualizar o sistema com as vendas do dia'},
+    {id:'ac8',txt:'Enviar lista de carros ativos (toda segunda)',sub:'Lista dos carros anunciados para cada cliente'}
+  ]
+};
+
+// STATE — salvo no localStorage
+function carregarST() {
+  try {
+    var salvo = localStorage.getItem('ub_st');
+    if (salvo) return JSON.parse(salvo);
+  } catch(e) {}
+  return {
+    clientes: [], vendas: [],
+    checks: {uadson:{},jp:{},ac:{}},
+    checksDate: {uadson:'',jp:'',ac:''},
+    extras: {uadson:[],jp:[],ac:[]}
+  };
+}
+function salvarST() {
+  try { localStorage.setItem('ub_st', JSON.stringify(ST)); } catch(e) {}
+}
+var ST = carregarST();
+
+// TABS
+function goTab(id, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  el.classList.add('on');
+  document.getElementById('p-'+id).classList.add('on');
+  renderAll();
+}
+
+// MODALS
+function openM(id) { updSels(); document.getElementById(id).classList.add('open'); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(function(m) {
+  m.addEventListener('click', function(e) { if(e.target===m) m.classList.remove('open'); });
+});
+function updSels() {
+  var opts = ST.clientes.map(function(c){return '<option value="'+c.id+'">'+c.nome+'</option>';}).join('');
+  var v = document.getElementById('v-cl');
+  if(v) v.innerHTML = opts || '<option>Sem clientes</option>';
+}
+
+// CLIENTES
+function abrirCliente() {
+  document.getElementById('c-eid').value='';
+  document.getElementById('m-cl-t').textContent='➕ Novo Cliente';
+  ['c-nome','c-cidade','c-verba','c-inicio','c-obs'].forEach(function(id){document.getElementById(id).value='';});
+  openM('m-cliente');
+}
+function editarCliente(id) {
+  var c = ST.clientes.filter(function(x){return x.id===id;})[0];
+  if(!c) return;
+  document.getElementById('m-cl-t').textContent='✏️ Editar Cliente';
+  document.getElementById('c-nome').value=c.nome;
+  document.getElementById('c-cidade').value=c.cidade||'';
+  document.getElementById('c-gestor').value=c.gestor;
+  document.getElementById('c-verba').value=c.verba;
+  document.getElementById('c-rec').value=c.recarga;
+  document.getElementById('c-inicio').value=c.inicio||'';
+  document.getElementById('c-obs').value=c.obs||'';
+  document.getElementById('c-eid').value=id;
+  document.getElementById('m-cliente').classList.add('open');
+}
+function salvarCliente() {
+  var nome = document.getElementById('c-nome').value.trim();
+  if(!nome) { alert('Informe o nome da loja.'); return; }
+  var eid = document.getElementById('c-eid').value;
+  var dados = {
+    nome: nome,
+    cidade: document.getElementById('c-cidade').value,
+    gestor: document.getElementById('c-gestor').value,
+    verba: parseFloat(document.getElementById('c-verba').value)||40,
+    recarga: document.getElementById('c-rec').value,
+    inicio: document.getElementById('c-inicio').value,
+    obs: document.getElementById('c-obs').value
+  };
+  if(eid) {
+    var i = -1;
+    ST.clientes.forEach(function(c,idx){if(c.id===parseInt(eid))i=idx;});
+    if(i>-1) ST.clientes[i] = Object.assign({}, ST.clientes[i], dados);
+  } else {
+    dados.id = Date.now();
+    ST.clientes.push(dados);
+  }
+  salvarST();
+  closeM('m-cliente');
+  renderAll();
+}
+function remCliente(id) {
+  if(!confirm('Remover este cliente?')) return;
+  ST.clientes = ST.clientes.filter(function(c){return c.id!==id;});
+  ST.vendas = ST.vendas.filter(function(v){return v.clienteId!==id;});
+  salvarST();
+  renderAll();
+}
+function renderClientes() {
+  var tb = document.getElementById('cl-tb');
+  if(!ST.clientes.length) {
+    tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:28px">Nenhum cliente cadastrado.</td></tr>';
+    return;
+  }
+  tb.innerHTML = ST.clientes.map(function(c) {
+    var carros = ST.vendas.filter(function(v){return v.clienteId===c.id&&v.mes===MES&&v.ano===ANO;}).length;
+    return '<tr>'+
+      '<td style="font-weight:600">'+c.nome+'</td>'+
+      '<td style="color:var(--muted)">'+( c.cidade||'—')+'</td>'+
+      '<td><span class="badge '+(c.gestor==='João Paulo'?'bb':'bg')+'">'+c.gestor+'</span></td>'+
+      '<td>R$'+c.verba+'/dia</td>'+
+      '<td><span class="badge '+(c.recarga==='Pix'?'bg':c.recarga==='Cartão de Crédito'?'bo':'bb')+'">'+c.recarga+'</span></td>'+
+      '<td style="color:var(--green);font-weight:700">'+carros+'</td>'+
+      '<td style="color:var(--muted);font-size:12px">'+(c.inicio?new Date(c.inicio+'T00:00:00').toLocaleDateString('pt-BR'):'—')+'</td>'+
+      '<td><div style="display:flex;gap:6px">'+
+        '<button class="btn-e" onclick="editarCliente('+c.id+')">✏️</button>'+
+        '<button class="btn-r" onclick="remCliente('+c.id+')">✕</button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+// VENDAS
+function addVenda() {
+  var cid = parseInt(document.getElementById('v-cl').value);
+  var cl = ST.clientes.filter(function(c){return c.id===cid;})[0];
+  if(!cl) { alert('Selecione um cliente.'); return; }
+  var mod = document.getElementById('v-mod').value.trim();
+  if(!mod) { alert('Informe o modelo.'); return; }
+  ST.vendas.push({
+    id: Date.now(), clienteId: cid, clienteNome: cl.nome, modelo: mod,
+    valor: parseFloat(document.getElementById('v-val').value)||0,
+    gasto: parseFloat(document.getElementById('v-gas').value)||0,
+    mes: parseInt(document.getElementById('v-mes').value),
+    ano: parseInt(document.getElementById('v-ano').value),
+    obs: document.getElementById('v-obs').value
+  });
+  salvarST();
+  closeM('m-venda');
+  ['v-mod','v-val','v-gas','v-obs'].forEach(function(id){document.getElementById(id).value='';});
+  renderAll();
+}
+function remVenda(id) {
+  ST.vendas = ST.vendas.filter(function(v){return v.id!==id;});
+  salvarST();
+  renderAll();
+}
+function editarVenda(id) {
+  var v = ST.vendas.filter(function(x){return x.id===id;})[0];
+  if(!v) return;
+  document.getElementById('ve-mod').value=v.modelo;
+  document.getElementById('ve-val').value=v.valor;
+  document.getElementById('ve-gas').value=v.gasto;
+  document.getElementById('ve-mes').value=v.mes;
+  document.getElementById('ve-obs').value=v.obs||'';
+  document.getElementById('ve-id').value=id;
+  var sel=document.getElementById('ve-ano');
+  sel.innerHTML='';
+  for(var y=2025;y<=2033;y++) sel.innerHTML+='<option value="'+y+'"'+(y===v.ano?' selected':'')+'>'+y+'</option>';
+  document.getElementById('m-venda-edit').classList.add('open');
+}
+function salvarVenda() {
+  var id = parseInt(document.getElementById('ve-id').value);
+  var i = -1;
+  ST.vendas.forEach(function(v,idx){if(v.id===id)i=idx;});
+  if(i<0) return;
+  ST.vendas[i] = Object.assign({}, ST.vendas[i], {
+    modelo: document.getElementById('ve-mod').value.trim(),
+    valor: parseFloat(document.getElementById('ve-val').value)||0,
+    gasto: parseFloat(document.getElementById('ve-gas').value)||0,
+    mes: parseInt(document.getElementById('ve-mes').value),
+    ano: parseInt(document.getElementById('ve-ano').value),
+    obs: document.getElementById('ve-obs').value
+  });
+  salvarST();
+  closeM('m-venda-edit');
+  renderAll();
+}
+function renderVendas() {
+  var w = document.getElementById('vd-wrap');
+  if(!ST.clientes.length) { w.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px">Cadastre clientes primeiro.</div>'; return; }
+  w.innerHTML = ST.clientes.map(function(cl) {
+    var vs = ST.vendas.filter(function(v){return v.clienteId===cl.id;});
+    var mes = vs.filter(function(v){return v.mes===MES&&v.ano===ANO;});
+    var gt = vs.reduce(function(s,v){return s+v.gasto;},0);
+    var rows = vs.length ? (
+      '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:8px;font-family:\'Syne\',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:6px"><div>Modelo</div><div>Valor</div><div>Gasto</div><div>Mês</div><div>Obs</div><div></div></div>'+
+      vs.map(function(v){
+        return '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;align-items:center">'+
+          '<div style="font-weight:600">'+v.modelo+'</div>'+
+          '<div style="color:var(--green)">R$'+v.valor.toLocaleString('pt-BR')+'</div>'+
+          '<div style="color:var(--orange)">R$'+v.gasto.toLocaleString('pt-BR')+'</div>'+
+          '<div style="color:var(--muted);font-size:12px">'+M3[v.mes]+'/'+v.ano+'</div>'+
+          '<div style="color:var(--muted);font-size:12px">'+(v.obs||'—')+'</div>'+
+          '<div style="display:flex;gap:4px"><button class="btn-e" onclick="editarVenda('+v.id+')">✏️</button><button class="btn-r" onclick="remVenda('+v.id+')">✕</button></div>'+
+        '</div>';
+      }).join('')
+    ) : '<div style="color:var(--muted);font-size:13px;text-align:center;padding:14px 0">Nenhuma venda registrada.</div>';
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px">'+
+      '<div style="padding:12px 16px;background:var(--card2);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)">'+
+        '<div><div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:14px">'+cl.nome+'</div><div style="font-size:11px;color:var(--muted)">'+(cl.cidade||'')+' · '+cl.gestor+'</div></div>'+
+        '<div style="display:flex;gap:12px;text-align:right">'+
+          '<div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:18px;color:var(--green)">'+vs.length+'</div><div style="font-size:10px;color:var(--muted)">total</div></div>'+
+          '<div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:15px;color:var(--blue)">'+mes.length+'</div><div style="font-size:10px;color:var(--muted)">mês</div></div>'+
+          '<div><div style="font-family:\'Syne\',sans-serif;font-weight:800;font-size:15px;color:var(--orange)">R$'+gt.toLocaleString('pt-BR')+'</div><div style="font-size:10px;color:var(--muted)">gasto</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="padding:14px 16px">'+rows+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+// CHECKLIST
+function toggleCK(pessoa, id) {
+  var hj = HOJE.toDateString();
+  if(!ST.checks[pessoa]) ST.checks[pessoa]={};
+  if(ST.checksDate[pessoa]!==hj) { ST.checks[pessoa]={}; ST.checksDate[pessoa]=hj; }
+  ST.checks[pessoa][id] = !ST.checks[pessoa][id];
+  salvarST();
+  renderChecklist();
+}
+function resetCL(pessoa) {
+  if(!confirm('Reiniciar checklist?')) return;
+  ST.checks[pessoa]={};
+  salvarST();
+  renderChecklist();
+}
+function addTarefa() {
+  var pessoa = document.getElementById('t-pessoa').value;
+  var txt = document.getElementById('t-txt').value.trim();
+  if(!txt) { alert('Informe a tarefa.'); return; }
+  if(!ST.extras[pessoa]) ST.extras[pessoa]=[];
+  ST.extras[pessoa].push({id:'e'+Date.now(), txt:txt, sub:document.getElementById('t-desc').value});
+  salvarST();
+  closeM('m-tarefa');
+  renderChecklist();
+}
+function remTarefa(pessoa, id) {
+  ST.extras[pessoa] = ST.extras[pessoa].filter(function(t){return t.id!==id;});
+  salvarST();
+  renderChecklist();
+}
+function renderChecklist() {
+  var al='';
+  if(SEM===1) al+='<div class="alerta al-b">📋 Hoje é segunda — enviar lista de carros ativos!</div>';
+  if(DIA===1) al+='<div class="alerta al-y">📄 Hoje é dia 1 — enviar relatório mensal!</div>';
+  document.getElementById('cl-alertas').innerHTML=al;
+  var configs=[
+    {key:'uadson',nome:'Uadson Borges',avClass:'av-ua',sigla:'UA',cor:'var(--orange)'},
+    {key:'jp',nome:'João Paulo',avClass:'av-jp',sigla:'JP',cor:'var(--blue)'},
+    {key:'ac',nome:'Ana Clara',avClass:'av-ac',sigla:'AC',cor:'var(--green)'}
+  ];
+  document.getElementById('cl-resumo').innerHTML=configs.map(function(g) {
+    var hj=HOJE.toDateString();
+    if(ST.checksDate[g.key]!==hj){ST.checks[g.key]={};ST.checksDate[g.key]=hj;}
+    var base=CL_BASE[g.key]||[];
+    var extra=ST.extras[g.key]||[];
+    var all=base.concat(extra);
+    var done=all.filter(function(t){return ST.checks[g.key][t.id];}).length;
+    var pct=all.length?(done/all.length*100):0;
+    return '<div class="card">'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'+
+        '<div class="gc-av '+g.avClass+'" style="width:34px;height:34px;font-size:11px">'+g.sigla+'</div>'+
+        '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:13px">'+g.nome+'</div>'+
+      '</div>'+
+      '<div style="font-family:\'Syne\',sans-serif;font-size:22px;font-weight:800;color:'+(done===all.length&&all.length>0?'var(--green)':g.cor)+'">'+done+'/'+all.length+'</div>'+
+      '<div class="pw" style="margin-top:8px"><div class="pb" style="background:'+g.cor+';width:'+pct+'%"></div></div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('cl-listas').innerHTML=configs.map(function(g) {
+    var base=CL_BASE[g.key]||[];
+    var extra=ST.extras[g.key]||[];
+    var all=base.concat(extra);
+    var done=all.filter(function(t){return ST.checks[g.key][t.id];}).length;
+    var pct=all.length?(done/all.length*100):0;
+    return '<div class="cl-box">'+
+      '<div class="cl-head">'+
+        '<div style="display:flex;align-items:center;gap:10px">'+
+          '<div class="gc-av '+g.avClass+'" style="width:30px;height:30px;font-size:10px">'+g.sigla+'</div>'+
+          '<span style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:13px">'+g.nome+'</span>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+          '<span style="font-size:12px;font-weight:700;color:'+(done===all.length&&all.length>0?'var(--green)':g.cor)+'">'+done+'/'+all.length+'</span>'+
+          '<button class="btn-g" style="font-size:10px;padding:3px 9px" onclick="document.getElementById(\'t-pessoa\').value=\''+g.key+'\';openM(\'m-tarefa\')">+</button>'+
+          '<button class="btn-g" style="font-size:10px;padding:3px 9px" onclick="resetCL(\''+g.key+'\')">🔄</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="cl-bar"><div class="cl-fill" style="background:'+g.cor+';width:'+pct+'%"></div></div>'+
+      all.map(function(t) {
+        var done2=!!ST.checks[g.key][t.id];
+        var isExtra=extra.some(function(e){return e.id===t.id;});
+        return '<div class="ck" onclick="toggleCK(\''+g.key+'\',\''+t.id+'\')">'+
+          '<div class="ck-box '+(done2?'done':'')+'"></div>'+
+          '<div class="ck-txt">'+
+            '<div class="ck-lbl '+(done2?'done':'')+'">'+t.txt+'</div>'+
+            (t.sub?'<div class="ck-sub">'+t.sub+'</div>':'')+
+          '</div>'+
+          (isExtra?'<button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;opacity:.6;padding:0 0 0 4px" onclick="event.stopPropagation();remTarefa(\''+g.key+'\',\''+t.id+'\')">✕</button>':'')+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }).join('');
+}
+
+// GESTORES
+function renderGestores() {
+  var configs=[
+    {key:'uadson',nome:'Uadson Borges',avClass:'av-ua',sigla:'UA',role:'CEO / Fechamento',cor:'var(--orange)'},
+    {key:'jp',nome:'João Paulo',avClass:'av-jp',sigla:'JP',role:'Gestor de Tráfego',cor:'var(--blue)'},
+    {key:'ac',nome:'Ana Clara',avClass:'av-ac',sigla:'AC',role:'Gestora de Tráfego',cor:'var(--green)'}
+  ];
+  document.getElementById('gc-wrap').innerHTML=configs.map(function(g) {
+    var clientes=g.key==='jp'?ST.clientes.filter(function(c){return c.gestor==='João Paulo';}):
+                 g.key==='ac'?ST.clientes.filter(function(c){return c.gestor==='Ana Clara';}):ST.clientes;
+    var vendMes=ST.vendas.filter(function(v){return clientes.some(function(c){return c.id===v.clienteId;})&&v.mes===MES&&v.ano===ANO;});
+    var base=CL_BASE[g.key]||[];
+    var extra=ST.extras[g.key]||[];
+    var all=base.concat(extra);
+    var done=all.filter(function(t){return (ST.checks[g.key]||{})[t.id];}).length;
+    return '<div class="gc">'+
+      '<div class="gc-head">'+
+        '<div class="gc-av '+g.avClass+'">'+g.sigla+'</div>'+
+        '<div>'+
+          '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:14px">'+g.nome+'</div>'+
+          '<div style="font-size:12px;color:var(--muted)">'+g.role+'</div>'+
+        '</div>'+
+        '<div style="margin-left:auto"><span class="badge '+(g.key==='jp'?'bb':g.key==='ac'?'bg':'bo')+'">'+clientes.length+' clientes</span></div>'+
+      '</div>'+
+      '<div class="gc-stats">'+
+        '<div class="gc-stat"><div class="gc-sv" style="color:'+g.cor+'">'+clientes.length+'</div><div class="gc-sl">Clientes</div></div>'+
+        '<div class="gc-stat"><div class="gc-sv" style="color:var(--green)">'+vendMes.length+'</div><div class="gc-sl">Carros/mês</div></div>'+
+        '<div class="gc-stat"><div class="gc-sv" style="color:'+(done===all.length&&all.length>0?'var(--green)':'var(--orange)')+'">'+done+'/'+all.length+'</div><div class="gc-sl">Tarefas</div></div>'+
+      '</div>'+
+      '<div style="padding:12px 16px">'+
+        '<div style="font-family:\'Syne\',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Clientes</div>'+
+        (clientes.length?clientes.map(function(c){
+          var cv=ST.vendas.filter(function(v){return v.clienteId===c.id&&v.mes===MES&&v.ano===ANO;}).length;
+          return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px">'+
+            '<span>'+c.nome+'</span>'+
+            '<span style="color:var(--green);font-weight:700">'+cv+' carros</span>'+
+          '</div>';
+        }).join(''):'<div style="color:var(--muted);font-size:13px;padding:6px 0">Nenhum cliente atribuído.</div>')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+// DASHBOARD
+function renderDash() {
+  var total=ST.clientes.length;
+  var gt=ST.vendas.reduce(function(s,v){return s+v.gasto;},0);
+  var carrosMes=ST.vendas.filter(function(v){return v.mes===MES&&v.ano===ANO;}).length;
+  var carrosTotal=ST.vendas.length;
+  var jp=ST.clientes.filter(function(c){return c.gestor==='João Paulo';}).length;
+  var ac=ST.clientes.filter(function(c){return c.gestor==='Ana Clara';}).length;
+  document.getElementById('d-cl').textContent=total;
+  document.getElementById('d-ca').textContent=carrosTotal;
+  document.getElementById('d-gt').textContent='R$'+gt.toLocaleString('pt-BR');
+  document.getElementById('d-cm').textContent=carrosMes;
+  document.getElementById('d-jp').textContent=jp+' clientes';
+  document.getElementById('d-ac').textContent=ac+' clientes';
+  document.getElementById('d-jp-b').style.width=total?(jp/total*100)+'%':'0%';
+  document.getElementById('d-ac-b').style.width=total?(ac/total*100)+'%':'0%';
+  document.getElementById('d-vcl').innerHTML=ST.clientes.map(function(c){
+    var v=ST.vendas.filter(function(x){return x.clienteId===c.id&&x.mes===MES&&x.ano===ANO;}).length;
+    return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span>'+c.nome+'</span><span style="color:var(--green);font-weight:700">'+v+' carros</span></div>';
+  }).join('')||'<span style="color:var(--muted)">Nenhuma venda.</span>';
+}
+
+// RELATÓRIO
+function populateRelFiltros() {
+  var selAno=document.getElementById('rel-ano');
+  selAno.innerHTML='<option value="">Todos os anos</option>';
+  for(var y=2025;y<=2033;y++) selAno.innerHTML+='<option value="'+y+'"'+(y===ANO?' selected':'')+'>'+y+'</option>';
+  var selCl=document.getElementById('rel-cliente');
+  selCl.innerHTML='<option value="">Todos os clientes</option>';
+  ST.clientes.forEach(function(c){selCl.innerHTML+='<option value="'+c.id+'">'+c.nome+'</option>';});
+}
+function renderRelatorio() {
+  var w=document.getElementById('rel-wrap');
+  var anoSel=document.getElementById('rel-ano').value;
+  var clSel=document.getElementById('rel-cliente').value;
+  var clientes=clSel?ST.clientes.filter(function(c){return c.id===parseInt(clSel);}):ST.clientes;
+  var anos=anoSel?[parseInt(anoSel)]:[2025,2026,2027,2028,2029,2030,2031,2032,2033];
+  if(!clientes.length){w.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px">Nenhum cliente encontrado.</div>';return;}
+  var html='';
+  if(clSel) {
+    var cl=clientes[0];
+    html+='<div class="g4" style="margin-bottom:20px">';
+    anos.forEach(function(y){
+      var vs=ST.vendas.filter(function(v){return v.clienteId===cl.id&&v.ano===y;});
+      var gt=vs.reduce(function(s,v){return s+v.gasto;},0);
+      html+='<div class="card" style="text-align:center;'+(y===ANO?'border-color:var(--orange)':'')+'">'+
+        '<div class="c-lbl">'+y+'</div>'+
+        '<div class="c-val" style="color:'+(vs.length>0?'var(--green)':'var(--muted)')+'">'+vs.length+'</div>'+
+        '<div class="c-sub">'+(vs.length>0?'R$'+gt.toLocaleString('pt-BR'):'sem vendas')+'</div>'+
+      '</div>';
+    });
+    html+='</div>';
+    anos.forEach(function(y){
+      var vsAno=ST.vendas.filter(function(v){return v.clienteId===cl.id&&v.ano===y;});
+      if(!vsAno.length&&y>ANO) return;
+      var gtAno=vsAno.reduce(function(s,v){return s+v.gasto;},0);
+      html+='<div class="tw" style="margin-bottom:14px">'+
+        '<div class="th"><div class="th-t">'+cl.nome+' — '+y+'</div><div style="display:flex;gap:14px;font-size:13px"><span style="color:var(--green)">'+vsAno.length+' carros</span><span style="color:var(--orange)">R$'+gtAno.toLocaleString('pt-BR')+'</span></div></div>'+
+        '<table><thead><tr><th>Mês</th><th>Carros</th><th>Gasto</th><th>Modelos</th></tr></thead><tbody>'+
+        [0,1,2,3,4,5,6,7,8,9,10,11].map(function(m){
+          var mv=ST.vendas.filter(function(v){return v.clienteId===cl.id&&v.mes===m&&v.ano===y;});
+          var dest=m===MES&&y===ANO;
+          if(!mv.length) return '<tr style="'+(dest?'background:rgba(232,119,34,.05)':'')+'"><td style="color:var(--muted)">'+MESES[m]+'</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">—</td></tr>';
+          return '<tr style="'+(dest?'background:rgba(29,184,122,.05)':'')+'"><td style="font-weight:600">'+MESES[m]+'</td><td style="color:var(--green);font-weight:700">'+mv.length+'</td><td style="color:var(--orange)">R$'+mv.reduce(function(s,v){return s+v.gasto;},0).toLocaleString('pt-BR')+'</td><td style="font-size:12px;color:var(--muted)">'+mv.map(function(v){return v.modelo;}).join(', ')+'</td></tr>';
+        }).join('')+
+        '</tbody></table></div>';
+    });
+  } else {
+    var anosShow=anoSel?[parseInt(anoSel)]:[ANO];
+    anosShow.forEach(function(y){
+      html+='<div class="sec" style="margin-top:8px">'+y+'</div>';
+      html+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px">';
+      [0,1,2,3,4,5,6,7,8,9,10,11].forEach(function(m){
+        var vs=ST.vendas.filter(function(v){return v.mes===m&&v.ano===y;});
+        var g=vs.reduce(function(s,v){return s+v.gasto;},0);
+        var dest=m===MES&&y===ANO;
+        html+='<div class="card" style="text-align:center;padding:10px;'+(dest?'border-color:var(--orange)':'')+'">' +
+          '<div class="c-lbl" style="font-size:9px">'+M3[m]+'</div>'+
+          '<div style="font-family:\'Syne\',sans-serif;font-size:20px;font-weight:800;color:'+(vs.length?'var(--green)':'var(--muted)')+'">'+vs.length+'</div>'+
+          '<div style="font-size:10px;color:var(--muted)">'+(vs.length?'R$'+g.toLocaleString('pt-BR'):'—')+'</div>'+
+        '</div>';
+      });
+      html+='</div>';
+      html+='<div class="tw" style="margin-bottom:20px"><div class="th"><div class="th-t">Todos os clientes — '+y+'</div><div style="font-size:13px;color:var(--green)">'+ST.vendas.filter(function(v){return v.ano===y;}).length+' carros</div></div>'+
+        '<div style="overflow-x:auto"><table><thead><tr><th>Cliente</th><th>Gest.</th>'+[0,1,2,3,4,5,6,7,8,9,10,11].map(function(m){return '<th style="'+(m===MES&&y===ANO?'color:var(--orange)':'')+'">'+(M3[m])+'</th>';}).join('')+'<th>Total</th></tr></thead><tbody>'+
+        clientes.map(function(cl){
+          var vtotal=ST.vendas.filter(function(v){return v.clienteId===cl.id&&v.ano===y;});
+          return '<tr><td style="font-weight:600;white-space:nowrap">'+cl.nome+'</td>'+
+            '<td><span class="badge '+(cl.gestor==='João Paulo'?'bb':'bg')+'" style="font-size:10px">'+(cl.gestor==='João Paulo'?'JP':'AC')+'</span></td>'+
+            [0,1,2,3,4,5,6,7,8,9,10,11].map(function(m){
+              var n=ST.vendas.filter(function(v){return v.clienteId===cl.id&&v.mes===m&&v.ano===y;}).length;
+              var dest=m===MES&&y===ANO;
+              return '<td style="text-align:center;'+(n>0?'color:var(--green);font-weight:700':'color:var(--muted)')+(dest?';background:rgba(232,119,34,.04)':'')+'">'+(n||'—')+'</td>';
+            }).join('')+
+            '<td style="color:var(--green);font-weight:700;text-align:center">'+vtotal.length+'</td>'+
+          '</tr>';
+        }).join('')+
+        '</tbody></table></div></div>';
+    });
+  }
+  w.innerHTML=html||'<div style="color:var(--muted);text-align:center;padding:40px">Nenhuma venda registrada ainda.</div>';
+}
+
+// RENDER ALL
+function renderAll() {
+  populateRelFiltros();
+  renderDash();
+  renderGestores();
+  renderClientes();
+  renderVendas();
+  renderChecklist();
+  renderRelatorio();
+}
+
+// INIT
+document.getElementById('hdrDate').textContent=HOJE.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+var vanoEl=document.getElementById('v-ano');
+for(var y=2025;y<=2033;y++) vanoEl.innerHTML+='<option value="'+y+'"'+(y===ANO?' selected':'')+'>'+y+'</option>';
+document.getElementById('v-mes').value=MES;
+renderAll();
+</script>
+</body>
+</html>
